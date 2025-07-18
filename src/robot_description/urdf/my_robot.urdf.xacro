@@ -1,0 +1,4 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="wheeler">
+    <xacro:include filename="body.xacro" />
+    <xacro:include filename="my_robot_gazebo.xacro" />
+</robot>

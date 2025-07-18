@@ -1,0 +1,154 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <gazebo reference="base_link">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+  <gazebo reference="lidar_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  <gazebo reference="front_plate">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="wheel1">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="wheel2">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="wheel3">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="wheel4">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <!-- Define friction coefficients -->
+  <xacro:property name="mu1" value="1" />
+  <xacro:property name="mu2" value="1" />
+  <xacro:property name="kp" value="1000000.0" />
+  <xacro:property name="kd" value="100.0" />
+
+  <gazebo reference="wheel1">
+    <mu1>${mu1}</mu1>
+    <mu2>${mu2}</mu2>
+    <kp>${kp}</kp>
+    <kd>${kd}</kd>
+    <fdir1>0 0 0</fdir1>
+  </gazebo>
+  <gazebo reference="wheel2">
+    <mu1>${mu1}</mu1>
+    <mu2>${mu2}</mu2>
+    <kp>${kp}</kp>
+    <kd>${kd}</kd>
+    <fdir1>0 0 0</fdir1>
+  </gazebo>
+  <gazebo reference="wheel3">
+    <mu1>${mu1}</mu1>
+    <mu2>${mu2}</mu2>
+    <kp>${kp}</kp>
+    <kd>${kd}</kd>
+    <fdir1>0 0 0</fdir1>
+  </gazebo>
+  <gazebo reference="wheel4">
+    <mu1>${mu1}</mu1>
+    <mu2>${mu2}</mu2>
+    <kp>${kp}</kp>
+    <kd>${kd}</kd>
+    <fdir1>0 0 0</fdir1>
+  </gazebo>
+
+    <gazebo>
+        <plugin name="wheel_drive_controller" filename="libgazebo_ros_diff_drive.so">
+
+        <num_wheel_pairs>2</num_wheel_pairs>
+        <!-- Wheel joints -->
+        <left_joint>wheel3_jnt</left_joint>
+        <right_joint>wheel4_jnt</right_joint>
+
+        <left_joint>wheel2_jnt</left_joint>
+        <right_joint>wheel1_jnt</right_joint>
+
+        <!-- Kinematics -->
+        <wheel_separation>0.280</wheel_separation>
+        <wheel_diameter>0.12</wheel_diameter>
+
+        <!-- Limits -->
+        <max_wheel_torque>8000.0</max_wheel_torque>
+        <max_wheel_acceleration>20.0</max_wheel_acceleration>
+
+        <!-- Topics and frames -->
+        <robot_base_frame>base_footprint</robot_base_frame>
+        <odometry_frame>odom</odometry_frame>
+        <odom_topic>odom</odom_topic>
+        <command_topic>cmd_vel</command_topic>
+
+        <!-- Publish settings -->
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>true</publish_odom_tf>
+        <update_rate>30.0</update_rate>
+
+        </plugin>
+    </gazebo>
+
+    <gazebo reference="imu_link">
+      <gravity>true</gravity>
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <visualize>true</visualize>
+        <topic>imu</topic>
+        <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+          <topicName>imu</topicName>
+          <bodyName>imu_link</bodyName>
+          <updateRateHZ>10.0</updateRateHZ>
+          <gaussianNoise>0.0</gaussianNoise>
+          <xyzOffset>0 0 0</xyzOffset>
+          <rpyOffset>0 0 0</rpyOffset>
+          <frameName>imu_link</frameName>
+        </plugin>
+        <pose>0 0 0 0 0 0</pose>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="lidar_link">
+ 
+        <sensor name="lidar" type="ray">
+            <pose> 0 0 0.2 0 0 0 </pose>
+            <visualize>true</visualize>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>360</samples>
+                        <min_angle>-3.14</min_angle>
+                        <max_angle>3.14</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.3</min>
+                    <max>12</max>
+                </range>
+            </ray>
+            <plugin name="laser_controller" filename="libgazebo_ros_ray_sensor.so">
+                <ros>
+                    <argument>~/out:=scan</argument>
+                </ros>
+                <output_type>sensor_msgs/LaserScan</output_type>
+                <frame_name>lidar_link</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="joint_state_publisher_wheeler" filename="libgazebo_ros_joint_state_publisher.so">
+        <ros>
+          <remapping>~/out:=joint_states</remapping>
+        </ros>
+        <update_rate>30</update_rate>
+        <joint_name>wheel1_jnt</joint_name>
+        <joint_name>wheel2_jnt</joint_name>
+        <joint_name>wheel3_jnt</joint_name>
+        <joint_name>wheel4_jnt</joint_name>
+      </plugin>   
+    </gazebo>  
+
+</robot>

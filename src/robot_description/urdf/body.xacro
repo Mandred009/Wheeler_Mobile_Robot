@@ -1,0 +1,138 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <link name="base_footprint"/>
+
+    <xacro:macro name="link_create" params="name mass l w h r g b">
+        <link name="${name}">
+            <inertial>
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                <mass value="${mass}"/>
+                <inertia ixx="${(1.0/12.0)*mass*(l*l+h*h)}" ixy="0.0" ixz="0.0" iyy="${(1.0/12.0)*mass*(w*w+h*h)}" iyz="0.0" izz="${(1.0/12.0)*mass*(l*l+w*w)}"/>
+            </inertial>
+            <visual name="">
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                <geometry>
+                    <box size="${w} ${l} ${h}"/>
+                </geometry>
+                <material name="">
+                    <color rgba="${r} ${g} ${b} 1.0"/>
+                    <texture filename=""/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                <geometry>
+                    <box size="${w} ${l} ${h}"/>
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+    <xacro:macro name="wheel_create" params="name mass radius h r g b">
+        <link name="${name}">
+            <inertial>
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                <mass value="${mass}"/>
+                <inertia ixx="${(1.0/12.0)*mass*(3*radius*radius+h*h)}" ixy="0.0" ixz="0.0" iyy="${(1.0/12.0)*mass*(3*radius*radius+h*h)}" iyz="0.0" izz="${(1.0/12.0)*mass*radius*radius}"/>
+            </inertial>
+            <visual name="">
+                <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0"/>
+                <geometry>
+                    <cylinder radius="${radius}" length="${h}"/>
+                </geometry>
+                <material name="">
+                    <color rgba="${r} ${g} ${b} 1.0"/>
+                    <texture filename=""/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="1.57 0.0 0.0"/>
+                <geometry>
+                    <cylinder radius="${radius}" length="${h}"/>
+                </geometry>
+            </collision>
+        </link>
+        <transmission name="${name}_wheel_trans" type="SimpleTransmission">
+			<type>transmission_interface/SimpleTransmission</type>
+			<actuator name="${name}_wheel_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+			<joint name="${name}_wheel">
+				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+			</joint>
+		</transmission>
+    </xacro:macro>
+
+
+
+    <xacro:link_create name="base_link" mass="1.0" l="0.25" w="0.25" h="0.05" r="1.0" g="1.0" b="0.0"/>
+
+    <xacro:wheel_create name="wheel1" mass="0.5" radius="0.06" h="0.02" r="0.0" g="0.0" b="0.0"/>
+    <xacro:wheel_create name="wheel2" mass="0.5" radius="0.06" h="0.02" r="0.0" g="0.0" b="0.0"/>
+    <xacro:wheel_create name="wheel3" mass="0.5" radius="0.06" h="0.02" r="0.0" g="0.0" b="0.0"/>
+    <xacro:wheel_create name="wheel4" mass="0.5" radius="0.06" h="0.02" r="0.0" g="0.0" b="0.0"/>
+
+    <xacro:link_create name="lidar_link" mass="0.1" l="0.05" w="0.05" h="0.1" r="0.0" g="0.0" b="1.0"/>
+
+    <xacro:link_create name="front_plate" mass="0.001" l="0.10" w="0.05" h="0.02" r="1.0" g="0.0" b="0.0"/>
+
+    <link name="imu_link"/>
+
+    <joint name="base_jnt" type="fixed">
+        <origin xyz="0.0 0.0 0.05" rpy="0.0 0.0 -3.14"/>
+        <parent link="base_footprint"/>
+        <child link="base_link"/>
+    </joint>
+
+    <joint name="front_plate_jnt" type="fixed">
+        <origin xyz="0.15 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="front_plate"/>
+    </joint>
+
+    <joint name="wheel1_jnt" type="continuous">
+        <origin xyz="0.08 -0.140 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="wheel1"/>
+        <axis xyz="0.0 1.0 0.0"/>
+        <limit effort="10000.0" velocity="1000.0"/>
+        <dynamics damping="0.8" friction="0.5"/>
+    </joint>
+    <joint name="wheel2_jnt" type="continuous">
+        <origin xyz="0.08 0.140 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="wheel2"/>
+        <axis xyz="0.0 1.0 0.0"/>
+        <limit effort="10000.0" velocity="1000.0"/>
+        <dynamics damping="0.8" friction="0.5"/>
+    </joint>
+    <joint name="wheel3_jnt" type="continuous">
+        <origin xyz="-0.08 0.140 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="wheel3"/>
+        <axis xyz="0.0 1.0 0.0"/>
+        <limit effort="10000.0" velocity="1000.0"/>
+        <dynamics damping="0.8" friction="0.5"/>
+    </joint>
+    <joint name="wheel4_jnt" type="continuous">
+        <origin xyz="-0.08 -0.140 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="wheel4"/>
+        <axis xyz="0.0 1.0 0.0"/>
+        <limit effort="10000.0" velocity="1000.0"/>
+        <dynamics damping="0.8" friction="0.5"/>
+    </joint>
+
+    <joint name="lidar_jnt" type="fixed">
+        <origin xyz="0.0 0.0 0.05" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="lidar_link"/>
+    </joint>
+
+    <joint name="imu_jnt" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+    </joint>
+    
+    
+</robot>
